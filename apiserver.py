@@ -30,7 +30,7 @@ def extract_attractions(text):
 def geoparse():
     data = request.get_json()
     texts = data['texts']
-    results = {}
+    results = []
 
     for text in texts:
         # Geoparse the text
@@ -42,10 +42,10 @@ def geoparse():
         implies_travel = False
         implies_stay = False
         implies_attraction = False
-        attractions = []
+        attraction = None
 
         # Check for keywords related to air travel
-        air_travel_keywords = ["flight", "fly", "airplane", "airport","arrive", "depart"]
+        air_travel_keywords = ["flight", "fly", "airplane", "airport","departure"]
         for token in doc:
             if token.text in air_travel_keywords:
                 implies_travel = True
@@ -62,24 +62,23 @@ def geoparse():
         attractions = extract_attractions(text)
         if attractions:
             implies_attraction = True
+            attraction = attractions[0]
                 
-        # Prepare the response
+        # Prepare the response for the current input text
         analyzed_text = {
             'implies_travel': implies_travel,
             'implies_stay': implies_stay,
             'implies_attraction': implies_attraction,
-            'attractions': attractions
+            'attraction': attraction if implies_attraction else None
         }
 
         result = {
+            'input_text': text,
             'geoparse_result': json.loads(json.dumps(geoparse_result, default=serialize_numpy)),
-            'text_analysis': {
-                'input_text': text,
-                'analyzed_text': analyzed_text
-            }
+            'text_analysis': analyzed_text
         }
 
-        results[text] = result
+        results.append(result)
 
     return jsonify(results)
 
