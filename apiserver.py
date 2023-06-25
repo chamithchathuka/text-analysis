@@ -15,6 +15,17 @@ def serialize_numpy(obj):
         return float(obj)
     raise TypeError("Object of type {} is not JSON serializable".format(type(obj)))
 
+def extract_attractions(text):
+    doc = nlp(text)
+    
+    attractions = []
+    
+    for entity in doc.ents:
+        if entity.label_ in ["FAC", "ORG"] and entity.label_ != "GPE":
+            attractions.append(entity.text)
+    
+    return attractions
+
 @app.route('/geoparse', methods=['POST'])
 def geoparse():
     data = request.get_json()
@@ -47,20 +58,11 @@ def geoparse():
                 implies_stay = True
                 break
 
-        # Extract attraction using Mordecai geoparse
-      #  for entity in geoparse_result:
-          #  if 'properties' in entity and 'category' in entity['properties'] and entity['properties']['category'] == 'Tourist_Attraction':
-          #      attraction = entity['properties']['name']
-          #      implies_attraction = True
-          #      break
-          
-        # Extract attraction using Mordecai geoparse
-      #  for entity in geoparse_result['features']:
-       #     if entity['properties']['layer'] == 'venue':
-        #        attraction = entity['properties']['name']
-         #       implies_attraction = True
-          #      break
-          
+        # Extract public attractions
+        attractions = extract_attractions(text)
+        if attractions:
+            implies_attraction = True
+            attraction = attractions[0]
                 
         # Prepare the response
         analyzed_text = {
