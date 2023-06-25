@@ -42,10 +42,10 @@ def geoparse():
         implies_travel = False
         implies_stay = False
         implies_attraction = False
-        attraction = None
+        attractions = []
 
         # Check for keywords related to air travel
-        air_travel_keywords = ["flight", "fly", "airplane", "airport"]
+        air_travel_keywords = ["flight", "fly", "airplane", "airport","arrive", "depart"]
         for token in doc:
             if token.text in air_travel_keywords:
                 implies_travel = True
@@ -62,14 +62,13 @@ def geoparse():
         attractions = extract_attractions(text)
         if attractions:
             implies_attraction = True
-            attraction = attractions[0]
                 
         # Prepare the response
         analyzed_text = {
             'implies_travel': implies_travel,
             'implies_stay': implies_stay,
             'implies_attraction': implies_attraction,
-            'attraction': attraction if implies_attraction else None
+            'attractions': attractions
         }
 
         result = {
