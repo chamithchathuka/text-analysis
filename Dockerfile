@@ -9,6 +9,9 @@ COPY requirements.txt .
 
 # Install the Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir waitress
+RUN python -m spacy download en_core_web_lg
+RUN python -m spacy download en_core_web_sm
 
 # Copy the rest of the application code to the container
 COPY . .
@@ -17,4 +20,4 @@ COPY . .
 EXPOSE 8000
 
 # Define the command to run your application
-CMD ["python", "app.py"]
+CMD ["waitress-serve", "--port=8000", "app:app"]

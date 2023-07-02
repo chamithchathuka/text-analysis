@@ -5,7 +5,7 @@ import json
 import numpy as np
 
 app = Flask(__name__)
-geo = Geoparser()
+geo = Geoparser(es_hosts=["35.212.252.50:9200"], es_port=9200)
 nlp = spacy.load("en_core_web_sm")
 
 def serialize_numpy(obj):
@@ -83,4 +83,5 @@ def geoparse():
     return jsonify(results)
 
 if __name__ == '__main__':
-    app.run()
+    from waitress import serve
+    serve(app, host='0.0.0.0', port=8000)
